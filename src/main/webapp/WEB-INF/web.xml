@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <display-name>Bitrepository httpresolver</display-name>
+
+  <servlet>
+    <servlet-name>Bitrepository-httpresolver</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer
+    </servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>dk.statsbiblioteket.mediaplatform.httpresolver
+      </param-value>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Bitrepository-httpresolver</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+  <listener>
+    <listener-class>dk.statsbiblioteket.mediaplatform.httpresolver.HttpresolverContextListener
+    </listener-class>
+  </listener>
+
+</web-app>
+
+
