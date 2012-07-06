@@ -1,21 +1,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>dk.statsbiblioteket.mediaplatform</groupId>
+  <groupId>dk.statsbiblioteket.medieplatform</groupId>
   <artifactId>bitrepository-http-resolver</artifactId>
   <version>0.2-SNAPSHOT</version>
   <packaging>war</packaging>
 
-  <name>bitrepository-http-resolver</name>
+  <name>Bitrepository http resolver</name>
 
   <parent>
-    <groupId>dk.statsbiblioteket.mediaplatform</groupId>
-    <artifactId>bitrepository-url-client</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <groupId>dk.statsbiblioteket.sbprojects</groupId>
+    <artifactId>sbprojects-parent</artifactId>
+    <version>3</version>
   </parent>
 
   <description>Used for statsbiblioteket.dk's Medieplatform. Initially for acessing files in the bitrepository.
   </description>
+
+  <organization>
+    <name>The State and University Library, Denmark</name>
+    <url>http://statsbiblioteket.dk</url>
+  </organization>
+
+  <repositories>
+    <repository>
+      <id>sbprojects-nexus</id>
+      <url>https://sbprojects.statsbiblioteket.dk/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>sbforge-nexus</id>
+      <url>https://sbforge.org/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+
+
+  <scm>
+    <url>https://github.com/statsbiblioteket/bitrepositoryhttpresolver</url>
+    <connection>scm:git:git://github.com/statsbiblioteket/bitrepositoryhttpresolver.git</connection>
+    <developerConnection>scm:git:git@github.com:statsbiblioteket/bitrepositoryhttpresolver.git</developerConnection>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>javax</groupId>
@@ -35,7 +72,7 @@
     </dependency>
     <dependency>
       <groupId>org.bitrepository.reference</groupId>
-      <artifactId>bitrepository-modifying-client</artifactId>
+      <artifactId>bitrepository-access-client</artifactId>
       <version>${bitrepository-version}</version>
     </dependency>
     <dependency>
@@ -106,4 +143,12 @@
       </plugin>
     </plugins>
   </build>
+
+  <properties>
+    <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <bitrepository-version>0.17</bitrepository-version>
+    <slf4j.version>1.6.4</slf4j.version>
+  </properties>
+
 </project>

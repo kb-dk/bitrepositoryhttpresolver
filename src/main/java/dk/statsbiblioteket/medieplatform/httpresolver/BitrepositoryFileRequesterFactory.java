@@ -33,10 +33,12 @@ public class BitrepositoryFileRequesterFactory {
     private static BitrepositoryFileRequester requester;
     private static String privateKeyFile;
     private static String clientID;
+    private static String hostUrl;
 
     private static final String CONFIGFILE = "httpresolver.properties"; 
     private static final String PRIVATE_KEY_FILE = "dk.statsbiblioteket.medieplatform.httpresolver.privateKeyFile";
     private static final String CLIENT_ID = "dk.statsbiblioteket.medieplatform.httpresolver.clientID";
+    private static final String HOST_URL = "dk.statsbiblioteket.medieplatform.httpresolver.hosturl";
 
     /**
      * Initialization method for setting the configuration directory for the deployment. 
@@ -67,7 +69,7 @@ public class BitrepositoryFileRequesterFactory {
                     authenticator, signer, authorizer, permissionStore, clientID);
 
             try {
-                requester = new BitrepositoryFileRequester(settings, securityManager, clientID);
+                requester = new BitrepositoryFileRequester(settings, securityManager, clientID, hostUrl);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new RuntimeException(e);
@@ -88,6 +90,7 @@ public class BitrepositoryFileRequesterFactory {
 
             privateKeyFile = properties.getProperty(PRIVATE_KEY_FILE);
             clientID = properties.getProperty(CLIENT_ID);
+            hostUrl = properties.getProperty(HOST_URL);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

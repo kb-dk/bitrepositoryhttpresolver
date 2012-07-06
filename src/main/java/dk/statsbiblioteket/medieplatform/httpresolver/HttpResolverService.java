@@ -11,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 
@@ -36,14 +37,19 @@ public class HttpResolverService {
      * Method to request the delivery of a file from the bitrepository, blocking until a inputstream becomes available 
      */
     @GET
-    @Path("/getfile/")
+    @Path("/getfile/{fileID}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public StreamingOutput getFile() throws Exception {
+    public StreamingOutput getFile(@PathParam("fileID") String fileID) throws Exception {
         final InputStream is;
-        requester.getConnectionMapper().addMapping("foo");
-        is = requester.getConnectionMapper().getConnection("foo");
+        String token = requester.requestFile(fileID);
+        RequestContext requestContext = requester.getRequestContextMapper().getRequestContext(token);
+        synchronized (requestContext) {
+            requestContext.wait();
+            is = requestContext.getInputStream();
+        }
         
         if(is != null) {
+            requester.getRequestContextMapper().removeRequestContext(token);
             return new StreamingOutput() {
                 public void write(OutputStream output) throws IOException, WebApplicationException {
                     try {
@@ -62,7 +68,10 @@ public class HttpResolverService {
                 }
             };
         } else {
-            throw new WebApplicationException();
+            throw new WebApplicationException(Response.status(requestContext.getResponse())
+                    .entity(requestContext.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build());
         }
         
     }
@@ -76,18 +85,18 @@ public class HttpResolverService {
      */
     @PUT
     @Path("/uploadProxy/{ID}")
-    public void uploadFile(@PathParam("ID") String id, InputStream is) throws InterruptedException {
+    public void uploadFile(@PathParam("ID") String id, InputStream is) throws InterruptedException, IOException {
         try {
-            requester.getConnectionMapper().addConnection(id, is);
-        } catch (ConnectionMapperException e) {
-            try {
-                is.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            RequestContext requestContext = requester.getRequestContextMapper().getRequestContext(id);
+            synchronized (requestContext) {
+                requestContext.setInputStream(is);
+                requestContext.notifyAll();
             }
             synchronized (is) {
                 is.wait();
             }
+        } catch (RequestContextMapperException e) {
+            is.close();
         }
     }
     
