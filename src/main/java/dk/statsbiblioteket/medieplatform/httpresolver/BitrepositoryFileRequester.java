@@ -3,25 +3,30 @@ package dk.statsbiblioteket.medieplatform.httpresolver;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.jms.JMSException;
+
 import org.bitrepository.access.AccessComponentFactory;
 import org.bitrepository.access.getfile.GetFileClient;
 import org.bitrepository.common.settings.Settings;
+import org.bitrepository.protocol.messagebus.MessageBusManager;
 import org.bitrepository.protocol.security.SecurityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to handle the request of a file stored in the Bitrepository. 
  */
 public class BitrepositoryFileRequester {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private GetFileClient getFileClient;
     private final String hostUrl;
     private final RequestContextMapper contextMapper;
+    private final Settings settings;
     
-    /**
-     * Constructor 
-     */
     public BitrepositoryFileRequester(Settings settings, SecurityManager securityManager, String clientID, String hostUrl) {
-        contextMapper = new RequestContextMapper();
+    	this.settings = settings;
+    	contextMapper = new RequestContextMapper();
         getFileClient = AccessComponentFactory.getInstance().createGetFileClient(settings, securityManager, clientID);
         if(!hostUrl.endsWith("/")) {
             this.hostUrl = hostUrl + "/";
@@ -44,8 +49,7 @@ public class BitrepositoryFileRequester {
             contextMapper.addRequestContext(token, requestContext);
             getFileClient.getFileFromFastestPillar(fileID, null, url, handler);
         } catch (MalformedURLException e) {
-
-            e.printStackTrace();
+        	log.warn(e.toString());
         }
         return token;
 
@@ -63,7 +67,11 @@ public class BitrepositoryFileRequester {
      * Shutdown the BitrepositoryFileRequester in a graceful manner.  
      */
     public void shutdown() {
-        getFileClient.shutdown();
+    	try {
+			MessageBusManager.getMessageBus(settings.getCollectionID()).close();
+		} catch (JMSException e) {
+        	log.warn(e.toString());
+		}
     }
     
 }
